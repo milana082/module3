@@ -61,7 +61,7 @@ export interface IDetailsListBasicExampleItem {
   ManagerId: any;
 
 }
-s
+
 export interface IDetailsListBasicExampleState {
   items: IDetailsListBasicExampleItem[];
   selectionDetails: string;
