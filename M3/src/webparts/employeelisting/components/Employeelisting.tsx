@@ -75,7 +75,7 @@ export interface IDetailsListBasicExampleState {
   Experience: any;
   selectedusers: string[];
   Manager: [];
-  ManagerId:any;
+  ManagerId: any;
   SelectedItem: any;
   SelectedItemup: any;
   HideDialogup: boolean;
@@ -125,7 +125,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       Experience: '',
       DeptName: '',
       Manager: [],
-      ManagerId:'',
+      ManagerId: '',
       HideDialog: true,
       EditMode: false,
       // Nameup: '',
@@ -155,7 +155,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
     const { items, selectionDetails } = this.state;
 
 
-  
+
     return (
       <div>
         <Fabric>
@@ -242,7 +242,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                       resolveDelay={1000} />
                   </td>
                 </tr>
-                
+
               </table>
             </div>
             <DialogFooter>
@@ -313,7 +313,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                       showHiddenInUI={false}
                       ensureUser={true}
                       principalTypes={[PrincipalType.User]}
-                      resolveDelay={0}/>
+                      resolveDelay={1000} />
                   </td>
                 </tr>
               </table>
@@ -350,11 +350,11 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
 
   public getListItems = async () => {
 
-    await sp.web.lists.getByTitle("Employee").items.select("ID", "Name", "DOB", "FieldValuesAsText/DOB", "Experience", "DeptName/ID", "DeptName/DepartmentName","Manager/ID" , "Manager/EMail" ).expand("FieldValuesAsText", "DeptName", "Manager" ).get().then(items => {
+    await sp.web.lists.getByTitle("Employee").items.select("ID", "Name", "DOB", "FieldValuesAsText/DOB", "Experience", "DeptName/ID", "DeptName/DepartmentName", "Manager/ID", "Manager/EMail").expand("FieldValuesAsText", "DeptName", "Manager").get().then(items => {
 
-      let AllData: { Action: any; ID: any; Name: any; DOB: any; Experience: number; DeptName: any; DeptNameId: any; Manager: any; ManagerId: any;  }[] = [];
+      let AllData: { Action: any; ID: any; Name: any; DOB: any; Experience: number; DeptName: any; DeptNameId: any; Manager: any; ManagerId: any; }[] = [];
       items.map((data) => {
-        
+
         let Allusers: any[] = [];
         data.Manager.map((val: any) => {
           Allusers.push(val.EMail)
@@ -403,8 +403,21 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
 
   public onDropdownchange(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption) {
     console.log();
-    this.setState({ SelectedItem: item.key ,SelectedItemup: item.key })
+    this.setState({ SelectedItem: item.key, SelectedItemup: item.key })
 
+  }
+
+  public sendMail = async () => {
+
+    let addressString: string = await sp.utility.getCurrentUserEmailAddresses();
+    await sp.utility.sendEmail({
+      To: [addressString],
+      Subject: "This email is about...",
+      Body: "<b>New Item is Added</b>",
+      AdditionalHeaders: {
+        "content-type": "text/html"
+      },
+    });
   }
 
   // ---------peoplepicker-------------------
@@ -478,6 +491,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       }).then(() => {
         this.setState({ HideDialog: true })
         this.getListItems();
+        this.sendMail();
       }).catch((err) => {
         console.log(err);
       });
@@ -493,7 +507,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       ItemId: editItem.ID,
       DeptName: editItem.DeptName,
       SelectedItemup: editItem.DeptNameId,
-      selectedusers:editItem.Manager,
+      selectedusers: editItem.Manager,
       // ManagerId: { results: this.state.pluser },
       // ManagerId: editItem.ManagerId,
       HideDialogup: false,
