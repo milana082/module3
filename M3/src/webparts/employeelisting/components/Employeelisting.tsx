@@ -40,10 +40,13 @@ import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/People
 //   }
 // }
 
+
 const exampleChildClass = mergeStyles({
   display: 'block',
   marginBottom: '10px',
 });
+
+
 
 const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' } };
 
@@ -58,7 +61,7 @@ export interface IDetailsListBasicExampleItem {
   ManagerId: any;
 
 }
-
+s
 export interface IDetailsListBasicExampleState {
   items: IDetailsListBasicExampleItem[];
   selectionDetails: string;
