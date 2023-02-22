@@ -86,6 +86,10 @@ export interface IDetailsListBasicExampleState {
   DeptName: any;
   pluser: any,
   EditMode: boolean,
+  isUserInGroup:boolean,
+  hidebutton:boolean,
+  UserEmail:any,
+  gusers:any,
   // Nameup: any;
   // DOBup: any;
   // Experienceup: any;
@@ -128,6 +132,10 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       ManagerId: '',
       HideDialog: true,
       EditMode: false,
+      isUserInGroup:false,
+      hidebutton:true,
+      UserEmail:[],
+      gusers:[],
       // Nameup: '',
       // DOBup: '',
       // Experienceup: '',
@@ -154,8 +162,6 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
   render(): React.ReactElement<IEmployeelistingProps> {
     const { items, selectionDetails } = this.state;
 
-
-
     return (
       <div>
         <Fabric>
@@ -168,8 +174,9 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
             styles={textFieldStyles}
           />
 
-          <Announced message={`Number of items after filter applied: ${items.length}.`} />
-          <PrimaryButton text="Add Employee" onClick={() => { this.setState({ HideDialog: false }), this.reset() }} />
+          <Announced message={`Number of items after filter applied: ${items.length}.`} />{
+            this.state.hidebutton == false &&
+          <PrimaryButton text="Add Employee" onClick={() => { this.setState({ HideDialog: false }), this.reset() }} />}   
           <MarqueeSelection selection={this._selection}>
             <DetailsList
               items={this.state.items}
@@ -343,7 +350,9 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
   }
   public componentDidMount = () => {
     this.getListItems();
+    this.checkUserInGroup ();
     this._getdeplookupfield();
+    this._getcurrentuser();
 
     // this.getListItem();
   }
@@ -407,8 +416,10 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
 
   }
 
-  public sendMail = async () => {
 
+
+  //-----------for email ---------------------------------
+  public sendMail = async () => {
     let addressString: string = await sp.utility.getCurrentUserEmailAddresses();
     await sp.utility.sendEmail({
       To: [addressString],
@@ -419,6 +430,47 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       },
     });
   }
+
+  // public getAllUsers  = async () => {
+  //   const groupName = "AdminGroup";
+  //   sp.web.siteGroups
+  //     .getByName(groupName)
+  //     .users()
+  //     .then((users) => {
+  //       console.log(users);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }
+//   const groupID = 16;
+//   const users = await sp.web.siteGroups.getById(groupID).users();
+// // const group = await sp.web.siteGroups.getByName("AdminGroup");
+// // const users = await group.users();
+// console.log(users);
+  public checkUserInGroup  = async () => {
+    const groupID = 16;
+    const users = await sp.web.siteGroups.getById(groupID).users();
+    users.forEach((item) => {
+      if (item.Email.toLowerCase() == this.state.UserEmail.toLowerCase()) {
+        this.setState({ hidebutton: false })
+      }
+    })
+    this.setState({
+      gusers: users,
+    })
+
+      console.log(users);
+}
+
+public async _getcurrentuser(): Promise<any> {
+  const currentuser = await sp.profiles.userProfile;
+
+  this.setState({
+    UserEmail: currentuser.SipAddress,
+  },() => { this.checkUserInGroup() })
+  console.log(currentuser);
+}
 
   // ---------peoplepicker-------------------
   private _getPeoplePicker = (pluser: any) => {
@@ -478,7 +530,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
 
   }
 
-  //Create Item
+  //Create Item...........................
   public createItem = async () => {
 
     sp.web.lists.getByTitle("Employee")
@@ -497,7 +549,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       });
   }
 
-  //  edit items
+  //  edit items .........................................
   public editModeItems = async (Id: any) => {
     let editItem = this.state.items.filter((x: any) => { return x.ID == Id; })[0];
     this.setState({
@@ -542,6 +594,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
         console.log(err);
       });
   }
+
 
   // For ascending and descending order on Name Column 
   private _onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
