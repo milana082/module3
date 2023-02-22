@@ -413,7 +413,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
     await sp.utility.sendEmail({
       To: [addressString],
       Subject: "This email is about...",
-      Body: "<b>New Item is Added</b>",
+      Body: "<b>New Item is Added....!!</b>",
       AdditionalHeaders: {
         "content-type": "text/html"
       },
