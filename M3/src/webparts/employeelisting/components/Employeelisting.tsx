@@ -16,7 +16,7 @@ import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { DatePicker, Fabric, Icon } from 'office-ui-fabric-react';
 import { Dialog, DialogFooter } from '@fluentui/react/lib/Dialog'; // DialogFooter
-import { PrimaryButton, DefaultButton } from '@fluentui/react/lib/Button'; // DefaultButton, IButtonProps
+import { PrimaryButton, DefaultButton } from '@fluentui/react/lib/Button'; // IButtonProps
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 // import { Fabric } from 'office-ui-fabric-react';
 // import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
@@ -86,13 +86,11 @@ export interface IDetailsListBasicExampleState {
   DeptName: any;
   pluser: any,
   EditMode: boolean,
-  isUserInGroup:boolean,
-  hidebutton:boolean,
-  UserEmail:any,
-  gusers:any,
-  // Nameup: any;
-  // DOBup: any;
-  // Experienceup: any;
+  isUserInGroup: boolean,
+  hidebutton: boolean,
+  UserEmail: any,
+  gusers: any,
+
 
 }
 
@@ -121,7 +119,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       DeptNameId: '',
       HideDialogup: true,
       HideDialogconfirmation: true,
-      SelectedItem: 0,
+      SelectedItem: undefined,
       pluser: [],
       id: '',
       Name: '',
@@ -132,13 +130,11 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       ManagerId: '',
       HideDialog: true,
       EditMode: false,
-      isUserInGroup:false,
-      hidebutton:true,
-      UserEmail:[],
-      gusers:[],
-      // Nameup: '',
-      // DOBup: '',
-      // Experienceup: '',
+      isUserInGroup: false,
+      hidebutton: true,
+      UserEmail: [],
+      gusers: [],
+
 
 
     };
@@ -147,7 +143,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       onSelectionChanged: () => this.setState({ selectionDetails: this._getSelectionDetails() }),
     });
 
-    // Populate with items for demos.
+
     this._columns = [
       { key: 'column1', name: 'Action', fieldName: 'Action', minWidth: 100, maxWidth: 100, isResizable: true },
       { key: 'column2', name: 'ID', fieldName: 'ID', minWidth: 100, maxWidth: 100, isResizable: true },
@@ -176,7 +172,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
 
           <Announced message={`Number of items after filter applied: ${items.length}.`} />{
             this.state.hidebutton == false &&
-          <PrimaryButton text="Add Employee" onClick={() => { this.setState({ HideDialog: false }), this.reset() }} />}   
+            <PrimaryButton text="Add Employee" onClick={() => { this.setState({ HideDialog: false }), this.reset() }} />}
           <MarqueeSelection selection={this._selection}>
             <DetailsList
               items={this.state.items}
@@ -191,7 +187,6 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
               onItemInvoked={this._onItemInvoked}
             />
           </MarqueeSelection>
-
         </Fabric>
         <div className='adddialog'>
           <Dialog
@@ -350,7 +345,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
   }
   public componentDidMount = () => {
     this.getListItems();
-    this.checkUserInGroup ();
+    this.checkUserInGroup();
     this._getdeplookupfield();
     this._getcurrentuser();
 
@@ -403,18 +398,32 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
     })
   }
 
-  // public getallItems = (async () => {
-  //   /** Get all list items */
-  //   const listItems = await sp.web.lists.getByTitle("Employee").select("ID,Name,DOB,Experience,DeptName,").get();
-  //   console.table(listItems);
-  // })().catch(console.log)
+
+  private _getSelectionDetails(): string {
+    const selectionCount = this._selection.getSelectedCount();
 
 
-  public onDropdownchange(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption) {
-    console.log();
-    this.setState({ SelectedItem: item.key, SelectedItemup: item.key })
-
+    switch (selectionCount) {
+      case 0:
+        return 'No items selected';
+      case 1:
+        return '1 item selected: ' + (this._selection.getSelection()[0] as IDetailsListBasicExampleItem).Name;
+      default:
+        return `${selectionCount} items selected`;
+    }
   }
+  private _onItemInvoked = (item: IDetailsListBasicExampleItem): void => {
+    alert(`Item invoked: ${item.Name}`);
+  };
+
+
+  private _onFilter = (ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, text: string): void => {
+    this.setState({
+      items: text ? this.state.FilterData.filter(i => i.Name.toLowerCase().indexOf(text) > -1) : this.state.FilterData,
+    });
+  };
+
+
 
 
 
@@ -443,12 +452,15 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
   //       console.log(error);
   //     });
   // }
-//   const groupID = 16;
-//   const users = await sp.web.siteGroups.getById(groupID).users();
-// // const group = await sp.web.siteGroups.getByName("AdminGroup");
-// // const users = await group.users();
-// console.log(users);
-  public checkUserInGroup  = async () => {
+  //   const groupID = 16;
+  //   const users = await sp.web.siteGroups.getById(groupID).users();
+  // // const group = await sp.web.siteGroups.getByName("AdminGroup");
+  // // const users = await group.users();
+  // console.log(users);
+
+  //----------------hide and show add emlpoyee button------------------
+  //----------------check the user in the group------------------------
+  public checkUserInGroup = async () => {
     const groupID = 16;
     const users = await sp.web.siteGroups.getById(groupID).users();
     users.forEach((item) => {
@@ -460,63 +472,20 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       gusers: users,
     })
 
-      console.log(users);
-}
-
-public async _getcurrentuser(): Promise<any> {
-  const currentuser = await sp.profiles.userProfile;
-
-  this.setState({
-    UserEmail: currentuser.SipAddress,
-  },() => { this.checkUserInGroup() })
-  console.log(currentuser);
-}
-
-  // ---------peoplepicker-------------------
-  private _getPeoplePicker = (pluser: any) => {
-    let AllManager: any[] = [];
-    pluser.map((val: any) => {
-      AllManager.push(val.id)
-    })
-    this.setState({ pluser: AllManager });
+    console.log(users);
   }
+  //-----------------fetch current user with group users------------- 
+  public async _getcurrentuser(): Promise<any> {
+    const currentuser = await sp.profiles.userProfile;
 
-
-  private _getSelectionDetails(): string {
-    const selectionCount = this._selection.getSelectedCount();
-
-
-    switch (selectionCount) {
-      case 0:
-        return 'No items selected';
-      case 1:
-        return '1 item selected: ' + (this._selection.getSelection()[0] as IDetailsListBasicExampleItem).Name;
-      default:
-        return `${selectionCount} items selected`;
-    }
-  }
-  private _onItemInvoked = (item: IDetailsListBasicExampleItem): void => {
-    alert(`Item invoked: ${item.Name}`);
-  };
-
-
-  private _onFilter = (ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, text: string): void => {
     this.setState({
-      items: text ? this.state.FilterData.filter(i => i.Name.toLowerCase().indexOf(text) > -1) : this.state.FilterData,
-    });
-  };
-
-  // delete item................
-  public deleteItem = async (ID: any) => {
-    console.log(ID);
-    await sp.web.lists.getByTitle("Employee").items.getById(ID).delete().then((data) => {
-      console.log(data);
-      this.getListItems();
-    }).catch((err) => {
-      console.log(err);
-    });
+      UserEmail: currentuser.SipAddress,
+    }, () => { this.checkUserInGroup() })
+    console.log(currentuser);
   }
 
+
+  //--------------for dropdown-----------------------
   public _getdeplookupfield = async () => {
     const allItems: any[] = await sp.web.lists.getByTitle("Department").items.getAll();
     let dropdowndep: IDropdownOption[] = [];
@@ -526,9 +495,14 @@ public async _getcurrentuser(): Promise<any> {
     this.setState({
       projectlookupvalues: dropdowndep
     });
-
+  }
+  
+  public onDropdownchange(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption) {
+    console.log();
+    this.setState({ SelectedItem: item.key, SelectedItemup: item.key })
 
   }
+
 
   //Create Item...........................
   public createItem = async () => {
@@ -575,7 +549,6 @@ public async _getcurrentuser(): Promise<any> {
   }
   //update Item
   public UpdateItem = async (ItemId: any) => {
-
     await sp.web.lists.getByTitle("Employee").items.getById(ItemId)
       .update({
         Name: this.state.Name,
@@ -593,6 +566,27 @@ public async _getcurrentuser(): Promise<any> {
       .catch((err) => {
         console.log(err);
       });
+  }
+  
+  // delete item................
+  public deleteItem = async (ID: any) => {
+    console.log(ID);
+    await sp.web.lists.getByTitle("Employee").items.getById(ID).delete().then((data) => {
+      console.log(data);
+      this.getListItems();
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  
+  // ---------peoplepicker-------------------
+  private _getPeoplePicker = (pluser: any) => {
+    let AllManager: any[] = [];
+    pluser.map((val: any) => {
+      AllManager.push(val.id)
+    })
+    this.setState({ pluser: AllManager });
   }
 
 
