@@ -215,7 +215,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                     Experience :
                   </td>
                   <td>
-                    <input type="number" id="Experience" value={this.state.Experience ? this.state.Experience : ''} onChange={(e) => { this.setState({ Experience: e.target.value }); }} />
+                    <input type="number" min='0' id="Experience" value={this.state.Experience ? this.state.Experience : ''} onChange={(e) => { this.setState({ Experience: e.target.value }); }} />
                   </td>
                 </tr>
                 <tr className='Department'>
@@ -288,7 +288,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                     Experience :
                   </td>
                   <td>
-                    <input type="number" id="Experience" value={this.state.Experience ? this.state.Experience : ''} onChange={(e) => { this.setState({ Experience: e.target.value }); }} />
+                    <input type="number" min='0' id="Experience" value={this.state.Experience ? this.state.Experience : ''} onChange={(e) => { this.setState({ Experience: e.target.value }); }} />
                   </td>
                 </tr>
                 <tr className='Departmentup'>
@@ -341,13 +341,13 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
   }
 
   public reset = async () => {
-    this.setState({ Name: '', DOB: null, Experience: '', SelectedItemup: 0 })
+    this.setState({ Name: '', DOB: null, Experience: '', SelectedItemup: 0,selectedusers:[], })
   }
   public componentDidMount = () => {
     this.getListItems();
     this.checkUserInGroup();
-    this._getdeplookupfield();
     this._getcurrentuser();
+    this._getdeplookupfield();
 
     // this.getListItem();
   }
@@ -471,7 +471,6 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
     this.setState({
       gusers: users,
     })
-
     console.log(users);
   }
   //-----------------fetch current user with group users------------- 
@@ -534,7 +533,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       DeptName: editItem.DeptName,
       SelectedItemup: editItem.DeptNameId,
       selectedusers: editItem.Manager,
-      // ManagerId: { results: this.state.pluser },
+      ManagerId: { results: this.state.pluser },
       // ManagerId: editItem.ManagerId,
       HideDialogup: false,
       EditMode: true,
