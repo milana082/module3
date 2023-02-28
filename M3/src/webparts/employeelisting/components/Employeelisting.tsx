@@ -237,7 +237,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                   <td>
                     <PeoplePicker
                       context={this.props.spfxcontext}
-                      personSelectionLimit={3}
+                      personSelectionLimit={5}
                       showtooltip={true}
                       required={true}
                       disabled={false}
@@ -313,7 +313,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                   <td>
                     <PeoplePicker
                       context={this.props.spfxcontext}
-                      personSelectionLimit={3}
+                      personSelectionLimit={5}
                       showtooltip={true}
                       required={true}
                       disabled={false}
