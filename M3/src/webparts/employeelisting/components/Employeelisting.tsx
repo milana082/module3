@@ -90,8 +90,8 @@ export interface IDetailsListBasicExampleState {
   hidebutton: boolean,
   UserEmail: any,
   gusers: any,
-
-
+  checkFields: boolean,
+  
 }
 
 
@@ -134,6 +134,8 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       hidebutton: true,
       UserEmail: [],
       gusers: [],
+      checkFields: true,
+      
 
 
 
@@ -200,6 +202,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                   </td>
                   <td>
                     <input type="text" id="Name" value={this.state.Name ? this.state.Name : ''} onChange={(e) => { this.setState({ Name: e.target.value }); }} />
+                    {this.state.checkFields == false && (<p style={{ color: 'red' }}>Invalid Name</p>)}
                   </td>
                 </tr>
                 <tr className='DOB'>
@@ -216,6 +219,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                   </td>
                   <td>
                     <input type="number" min='0' id="Experience" value={this.state.Experience ? this.state.Experience : ''} onChange={(e) => { this.setState({ Experience: e.target.value }); }} />
+                    
                   </td>
                 </tr>
                 <tr className='Department'>
@@ -248,7 +252,9 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
               </table>
             </div>
             <DialogFooter>
-              <PrimaryButton text="Save" onClick={() => { this.createItem() }} />
+            {
+             (this.state.Name != '' && this.state.DOB !=null && this.state.Experience !='' && this.state.SelectedItemup !=0 && this.state.pluser.length>0 ) &&
+             ( <PrimaryButton text="Save" onClick={() => { this.onChangeSetName()}} /> )}
               <DefaultButton text="Cancel" onClick={() => { this.setState({ HideDialog: true }) }} />
             </DialogFooter>
           </Dialog>
@@ -264,6 +270,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                   </td>
                   <td>
                     <input type="text" id="Name" value={this.state.Name ? this.state.Name : ''} onChange={(e) => { this.setState({ Name: e.target.value }); }} />
+                    {this.state.checkFields == false && (<p style={{ color: 'red' }}>Invalid Name</p>)}
                   </td>
                 </tr>
                 <tr className='DOB'>
@@ -280,7 +287,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                     value={new Date(this.state.DOB)}
                     onSelectDate={(selectedDate) => {
                       this.setState({ DOB: selectedDate });
-                    }} />
+                    }} isRequired/>
                   </td>
                 </tr>
                 <tr className='Experience'>
@@ -320,8 +327,9 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                 </tr>
               </table>
             </div>
-            <DialogFooter>
-              <PrimaryButton text="Update" onClick={() => { this.updatedialog() }} />
+            <DialogFooter> {
+             (this.state.Name != '' && this.state.DOB !=null && this.state.Experience !='' && this.state.SelectedItemup !=0 && this.state.pluser.length>0 ) &&
+             (<PrimaryButton text="Update" onClick={() => { this.onChangeSetNameUp() }} />)}
               <DefaultButton text="Cancel" onClick={() => { this.setState({ HideDialogup: true }) }} />
             </DialogFooter>
           </Dialog>
@@ -340,8 +348,56 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
     );
   }
 
+  // function for hide save button
+public hide = () =>{
+  if(this.state.Name != '' && this.state.DOB !=null && this.state.Experience !='' && this.state.SelectedItemup !=0 && this.state.pluser.length >0){
+    this.state.hidebutton == false;
+  }
+  else{
+    this.state.hidebutton == true;
+  }
+}
+//function for hide update button
+public hideUp = () =>{
+  if(this.state.Name != '' && this.state.DOB !=null && this.state.Experience !='' && this.state.SelectedItemup !=0 && this.state.pluser.length >0){
+    this.state.hidebutton == false;
+  }
+  else{
+    this.state.hidebutton == true;
+  }
+}
+
+  // validation---------------------------------------------------------------
+  // val for createItem
+  public onChangeSetName = () => {
+    let pattern = new RegExp("^[a-zA-Z0-9.-]*$");
+    let isValid = pattern.test(this.state.Name);
+    if (isValid) {
+      this.setState({ checkFields: true });
+      this.hide();
+      this.createItem();
+    } else {
+      this.setState({ checkFields: false }, () => { });
+    }
+  };
+
+   // val for UpdateItem..................................................
+  public onChangeSetNameUp = () => {
+    let pattern = new RegExp("^[a-zA-Z0-9.-]*$");
+    let isValid = pattern.test(this.state.Name);
+    if (isValid) {
+      this.setState({ checkFields: true });
+      this.hideUp();
+      this.updatedialog();
+    } else {
+      this.setState({ checkFields: false }, () => { });
+    }
+  };
+
+
+
   public reset = async () => {
-    this.setState({ Name: '', DOB: null, Experience: '', SelectedItemup: 0,selectedusers:[], })
+    this.setState({ Name: '', DOB: null, Experience: '', SelectedItemup: 0, selectedusers: [], })
   }
   public componentDidMount = () => {
     this.getListItems();
@@ -457,6 +513,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
   // // const group = await sp.web.siteGroups.getByName("AdminGroup");
   // // const users = await group.users();
   // console.log(users);
+  //  /^[A-Za-z]+$/; ---> for name
 
   //----------------hide and show add emlpoyee button------------------
   //----------------check the user in the group------------------------
@@ -495,7 +552,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
       projectlookupvalues: dropdowndep
     });
   }
-  
+
   public onDropdownchange(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption) {
     console.log();
     this.setState({ SelectedItem: item.key, SelectedItemup: item.key })
@@ -566,7 +623,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
         console.log(err);
       });
   }
-  
+
   // delete item................
   public deleteItem = async (ID: any) => {
     console.log(ID);
@@ -578,7 +635,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
     });
   }
 
-  
+
   // ---------peoplepicker-------------------
   private _getPeoplePicker = (pluser: any) => {
     let AllManager: any[] = [];
