@@ -244,10 +244,9 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                       showHiddenInUI={false}
                       ensureUser={true}
                       principalTypes={[PrincipalType.User]}
-                      resolveDelay={1000} />
+                      resolveDelay={1000}/>
                   </td>
                 </tr>
-
               </table>
             </div>
             <DialogFooter>
