@@ -219,7 +219,6 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
                   </td>
                   <td>
                     <input type="number" min='0' id="Experience" value={this.state.Experience ? this.state.Experience : ''} onChange={(e) => { this.setState({ Experience: e.target.value }); }} />
-                    
                   </td>
                 </tr>
                 <tr className='Department'>
@@ -370,7 +369,7 @@ public hideUp = () =>{
   // validation---------------------------------------------------------------
   // val for createItem
   public onChangeSetName = () => {
-    let pattern = new RegExp("^[a-zA-Z0-9.-]*$");
+    let pattern = new RegExp("^[A-Za-z0-9 ]+$"); // ^[a-zA-Z0-9.-]*$
     let isValid = pattern.test(this.state.Name);
     if (isValid) {
       this.setState({ checkFields: true });
@@ -383,7 +382,7 @@ public hideUp = () =>{
 
    // val for UpdateItem..................................................
   public onChangeSetNameUp = () => {
-    let pattern = new RegExp("^[a-zA-Z0-9.-]*$");
+    let pattern = new RegExp("^[A-Za-z0-9 ]+$");
     let isValid = pattern.test(this.state.Name);
     if (isValid) {
       this.setState({ checkFields: true });
