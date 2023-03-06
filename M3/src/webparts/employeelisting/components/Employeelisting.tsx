@@ -347,7 +347,7 @@ export default class Employeelisting extends React.Component<IEmployeelistingPro
   }
 
   // function for hide save button
-public hide = () =>{
+public hideBtn = () =>{
   if(this.state.Name != '' && this.state.DOB !=null && this.state.Experience !='' && this.state.SelectedItemup !=0 && this.state.pluser.length >0){
     this.state.hidebutton == false;
   }
@@ -356,7 +356,7 @@ public hide = () =>{
   }
 }
 //function for hide update button
-public hideUp = () =>{
+public hideUpBtn = () =>{
   if(this.state.Name != '' && this.state.DOB !=null && this.state.Experience !='' && this.state.SelectedItemup !=0 && this.state.pluser.length >0){
     this.state.hidebutton == false;
   }
@@ -372,7 +372,7 @@ public hideUp = () =>{
     let isValid = pattern.test(this.state.Name);
     if (isValid) {
       this.setState({ checkFields: true });
-      this.hide();
+      this.hideBtn();
       this.createItem();
     } else {
       this.setState({ checkFields: false }, () => { });
@@ -385,7 +385,7 @@ public hideUp = () =>{
     let isValid = pattern.test(this.state.Name);
     if (isValid) {
       this.setState({ checkFields: true });
-      this.hideUp();
+      this.hideUpBtn();
       this.updatedialog();
     } else {
       this.setState({ checkFields: false }, () => { });
